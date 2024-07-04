@@ -8,9 +8,7 @@ import logging
 from os import environ
 import mysql.connector
 
-
 PII_FIELDS = ("name", "email", "phone", "ssn", "password")
-
 
 def filter_datum(fields: List[str], redaction: str,
                  message: str, separator: str) -> str:
@@ -19,7 +17,6 @@ def filter_datum(fields: List[str], redaction: str,
         message = re.sub(f'{f}=.*?{separator}',
                          f'{f}={redaction}{separator}', message)
     return message
-
 
 def get_logger() -> logging.Logger:
     """ Returns a Logger Object """
@@ -33,7 +30,6 @@ def get_logger() -> logging.Logger:
 
     return logger
 
-
 def get_db() -> mysql.connector.connection.MySQLConnection:
     """ Returns a connector to a MySQL database """
     username = environ.get("PERSONAL_DATA_DB_USERNAME", "root")
@@ -41,12 +37,13 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
     host = environ.get("PERSONAL_DATA_DB_HOST", "localhost")
     db_name = environ.get("PERSONAL_DATA_DB_NAME")
 
-    conn = mysql.connector.connection.MySQLConnection(user=username,
-                                                      password=password,
-                                                      host=host,
-                                                      database=db_name)
+    conn = mysql.connector.connect(
+        user=username,
+        password=password,
+        host=host,
+        database=db_name
+    )
     return conn
-
 
 def main():
     """
@@ -67,11 +64,8 @@ def main():
     cursor.close()
     db.close()
 
-
 class RedactingFormatter(logging.Formatter):
-    """ Redacting Formatter class
-        """
-
+    """ Redacting Formatter class """
     REDACTION = "***"
     FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
     SEPARATOR = ";"
@@ -85,7 +79,6 @@ class RedactingFormatter(logging.Formatter):
         record.msg = filter_datum(self.fields, self.REDACTION,
                                   record.getMessage(), self.SEPARATOR)
         return super(RedactingFormatter, self).format(record)
-
 
 if __name__ == '__main__':
     main()
