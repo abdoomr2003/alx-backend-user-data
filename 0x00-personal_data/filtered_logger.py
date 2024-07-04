@@ -10,6 +10,7 @@ import mysql.connector
 
 PII_FIELDS = ("name", "email", "phone", "ssn", "password")
 
+
 def filter_datum(fields: List[str], redaction: str,
                  message: str, separator: str) -> str:
     """ Returns a log message obfuscated """
@@ -17,6 +18,7 @@ def filter_datum(fields: List[str], redaction: str,
         message = re.sub(f'{f}=.*?{separator}',
                          f'{f}={redaction}{separator}', message)
     return message
+
 
 def get_logger() -> logging.Logger:
     """ Returns a Logger Object """
@@ -29,6 +31,7 @@ def get_logger() -> logging.Logger:
     logger.addHandler(stream_handler)
 
     return logger
+
 
 def get_db() -> mysql.connector.connection.MySQLConnection:
     """ Returns a connector to a MySQL database """
@@ -44,6 +47,7 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
         database=db_name
     )
     return conn
+
 
 def main():
     """
@@ -64,6 +68,7 @@ def main():
     cursor.close()
     db.close()
 
+
 class RedactingFormatter(logging.Formatter):
     """ Redacting Formatter class """
     REDACTION = "***"
@@ -79,6 +84,7 @@ class RedactingFormatter(logging.Formatter):
         record.msg = filter_datum(self.fields, self.REDACTION,
                                   record.getMessage(), self.SEPARATOR)
         return super(RedactingFormatter, self).format(record)
+
 
 if __name__ == '__main__':
     main()
