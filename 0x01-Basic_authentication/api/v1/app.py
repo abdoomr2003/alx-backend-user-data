@@ -21,7 +21,12 @@ if auth_type == 'auth':
 
 
 @app.before_request
-def my_before_request():
+def my_before_request() -> None:
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
     if auth is None:
         return
     apis = ['/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/']
