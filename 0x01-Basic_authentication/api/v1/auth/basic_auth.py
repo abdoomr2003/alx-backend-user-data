@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-""" this is basic auth"""
-from auth.auth import Auth
+""" this is basic auth
+"""
+from api.v1.auth.auth import Auth
 
 
 class BasicAuth(Auth):
