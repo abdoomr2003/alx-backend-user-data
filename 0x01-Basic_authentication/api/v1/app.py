@@ -32,7 +32,7 @@ def my_before_request() -> None:
     apis = ['/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/']
     if not (auth.require_auth(request.path, apis)):
         return
-    if auth.authorization_header(request) is None :
+    if auth.authorization_header(request) is None:
         return abort(401)
     if auth.current_user(request) is None:
         return abort(403)
