@@ -9,3 +9,4 @@ class BasicAuth(Auth):
     Args:
         Auth (_type_): _description_
     """
+    pass
