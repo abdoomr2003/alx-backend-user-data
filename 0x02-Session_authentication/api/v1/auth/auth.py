@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """ Module of Auth config
 """
+from os import getenv
 from flask import request
 from typing import (
     List,
     TypeVar as TypeVar
 )
-import fnmatch
 
 
 class Auth():
@@ -68,11 +68,7 @@ class Auth():
             str: The authorization header if present,
             None otherwise.
         """
-        if request is None:
-            return None
-        if request:
-            return request.headers.get('Authorization')
-        return None
+        return request.headers.get('Authorization') if request else None
 
     def current_user(self, request=None) -> TypeVar('User'):
         """ Retrieves the current user from the request.
@@ -86,3 +82,13 @@ class Auth():
             or None if no user is authenticated.
         """
         return None
+
+    def session_cookie(self, request=None) -> None:
+        """ returns a cookie value from a request
+        """
+        if request is None:
+            return None
+        session_name = getenv('SESSION_NAME')
+        if session_name is None:
+            return None
+        return request.cookies.get(session_name)
