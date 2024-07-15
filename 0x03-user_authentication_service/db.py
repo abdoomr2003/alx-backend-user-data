@@ -69,3 +69,25 @@ class DB:
         except InvalidRequestError:
             self._session.rollback()
             raise
+
+    def update_user(self, user_id, **args):
+        """
+        Update a user in the database.
+
+        Args:
+            user_id (int): The user ID.
+            **kwargs: Arbitrary keyword arguments to update the user.
+
+        Returns:
+            None
+        """
+        try:
+            user = self.find_user_by(id=user_id)
+            user.email = args.get('email', user.email)
+            user.hashed_password = args.get('hashed_password',
+                                            user.hashed_password)
+            self._session.add(user)
+            self._session.commit()
+            return None
+        except ValueError:
+            raise
