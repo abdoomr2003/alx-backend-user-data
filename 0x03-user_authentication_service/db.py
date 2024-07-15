@@ -32,7 +32,7 @@ class DB:
             self.__session = DBSession()
         return self.__session
 
-    def add_user(self, email, hashed_password):
+    def add_user(self, email: str, hashed_password: str) -> User:
         """Add a new user to the database.
 
         Args:
@@ -47,7 +47,7 @@ class DB:
         self._session.commit()
         return user
 
-    def find_user_by(self, **args):
+    def find_user_by(self, **args: dict) -> User:
         """
         Find a user in the database based on input arguments.
 
@@ -70,7 +70,7 @@ class DB:
             self._session.rollback()
             raise
 
-    def update_user(self, user_id, **args):
+    def update_user(self, user_id: str, **args: dict) -> None:
         """
         Update a user in the database.
 
