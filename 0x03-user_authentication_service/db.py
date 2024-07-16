@@ -47,7 +47,7 @@ class DB:
         self._session.commit()
         return user
 
-    def find_user_by(self, **args: dict) -> User:
+    def find_user_by(self, **args) -> User:
         """
         Find a user in the database based on input arguments.
 
@@ -70,7 +70,7 @@ class DB:
             self._session.rollback()
             raise
 
-    def update_user(self, user_id: str, **args: dict) -> None:
+    def update_user(self, user_id: str, **args) -> None:
         """
         Update a user in the database.
 
