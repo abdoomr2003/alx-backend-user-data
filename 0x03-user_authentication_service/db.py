@@ -70,7 +70,7 @@ class DB:
             self._session.rollback()
             raise
 
-    def update_user(self, user_id: str, **args) -> None:
+    def update_user(self, user_id: int, **args) -> None:
         """
         Update a user in the database.
 
