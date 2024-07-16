@@ -70,7 +70,7 @@ class DB:
             self._session.rollback()
             raise
 
-    def update_user(self, user_id: int, **args) -> None:
+    def update_user(self, user_id: int, **kwargs) -> None:
         """
         Update a user in the database.
 
@@ -83,11 +83,11 @@ class DB:
         """
         try:
             user = self.find_user_by(id=user_id)
-            user.email = args.get('email', user.email)
-            user.hashed_password = args.get('hashed_password',
-                                            user.hashed_password)
-            self._session.add(user)
-            self._session.commit()
+            for key, value in kwargs.items():
+                if hasattr(user, key):
+                    setattr(user, key, value)
+                    self.__session.add(user)
+                    self.__session.commit()
             return None
         except ValueError:
             raise

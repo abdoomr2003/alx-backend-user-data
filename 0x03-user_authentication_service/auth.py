@@ -15,7 +15,7 @@ def _hash_password(password: str) -> str:
     Returns:
         str: The hashed password.
     """
-    return hashpw(password.encode(), gensalt())
+    return hashpw(password.encode('utf-8'), gensalt())
 
 
 class Auth:
