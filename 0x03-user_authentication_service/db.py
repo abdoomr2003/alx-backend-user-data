@@ -42,12 +42,12 @@ class DB:
         Returns:
             User: The newly created User object.
         """
-        user = User(email=email, hashed_password=hashed_password)
-        self._session.add(user)
+        new_user = User(email=email, hashed_password=hashed_password)
+        self._session.add(new_user)
         self._session.commit()
-        return user
+        return new_user
 
-    def find_user_by(self, **args) -> User:
+    def find_user_by(self, **kwargs) -> User:
         """
         Find a user in the database based on input arguments.
 
@@ -61,33 +61,29 @@ class DB:
             NoResultFound: If no results are found.
             InvalidRequestError: If invalid query arguments are passed.
         """
-        try:
-            user = self._session.query(User).filter_by(**args).first()
-            if user is None:
-                raise NoResultFound
-            return user
-        except InvalidRequestError:
-            self._session.rollback()
-            raise
+        user_keys = ['id', 'email', 'hashed_password', 'session_id',
+                     'reset_token']
+        for key in kwargs.keys():
+            if key not in user_keys:
+                raise InvalidRequestError
+        result = self._session.query(User).filter_by(**kwargs).first()
+        if result is None:
+            raise NoResultFound
+        return result
 
     def update_user(self, user_id: int, **kwargs) -> None:
+        """Use find_user_by to locate the user to update
+        Update user's attribute as passed in methods argument
+        Commit changes to database
+        Raises ValueError if argument does not correspond to user
+        attribute passed
         """
-        Update a user in the database.
-
-        Args:
-            user_id (int): The user ID.
-            **kwargs: Arbitrary keyword arguments to update the user.
-
-        Returns:
-            None
-        """
-        user = self.find_user_by(id=user_id)
-        try:
-            for key, value in kwargs.items():
-                if hasattr(user, key):
-                    setattr(user, key, value)
-                    self.__session.add(user)
-                    self.__session.commit()
-            return None
-        except ValueError:
-            raise
+        user_to_update = self.find_user_by(id=user_id)
+        user_keys = ['id', 'email', 'hashed_password', 'session_id',
+                     'reset_token']
+        for key, value in kwargs.items():
+            if key in user_keys:
+                setattr(user_to_update, key, value)
+            else:
+                raise ValueError
+        self._session.commit()
