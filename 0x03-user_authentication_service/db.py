@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""DB module
+"""
+DB module
 """
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -18,7 +19,8 @@ class DB:
     def __init__(self) -> None:
         """Initialize a new DB instance
         """
-        self._engine = create_engine("sqlite:///a.db", echo=False)
+        self._engine = create_engine("sqlite:///a.db",
+                                     echo=False)
         Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
         self.__session = None
@@ -33,57 +35,55 @@ class DB:
         return self.__session
 
     def add_user(self, email: str, hashed_password: str) -> User:
-        """Add a new user to the database.
-
-        Args:
-            email (str): The user's email address.
-            hashed_password (str): The user's hashed password.
-
-        Returns:
-            User: The newly created User object.
         """
-        new_user = User(email=email, hashed_password=hashed_password)
-        self._session.add(new_user)
+        Create a User object and save it to the database
+        Args:
+            email (str): user's email address
+            hashed_password (str): password hashed by bcrypt's hashpw
+        Return:
+            Newly created User object
+        """
+        user = User(email=email, hashed_password=hashed_password)
+        self._session.add(user)
         self._session.commit()
-        return new_user
+        return user
 
     def find_user_by(self, **kwargs) -> User:
         """
-        Find a user in the database based on input arguments.
-
+        Return a user who has an attribute matching the attributes passed
+        as arguments
         Args:
-            **kwargs: Arbitrary keyword arguments to filter the query.
-
-        Returns:
-            User: The first matching User object.
-
-        Raises:
-            NoResultFound: If no results are found.
-            InvalidRequestError: If invalid query arguments are passed.
+            attributes (dict): a dictionary of attributes to match the user
+        Return:
+            matching user or raise error
         """
-        user_keys = ['id', 'email', 'hashed_password', 'session_id',
-                     'reset_token']
-        for key in kwargs.keys():
-            if key not in user_keys:
+        all_users = self._session.query(User)
+        for k, v in kwargs.items():
+            if k not in User.__dict__:
                 raise InvalidRequestError
-        result = self._session.query(User).filter_by(**kwargs).first()
-        if result is None:
-            raise NoResultFound
-        return result
+            for usr in all_users:
+                if getattr(usr, k) == v:
+                    return usr
+        raise NoResultFound
 
     def update_user(self, user_id: int, **kwargs) -> None:
-        """Use find_user_by to locate the user to update
-        Update user's attribute as passed in methods argument
-        Commit changes to database
-        Raises ValueError if argument does not correspond to user
-        attribute passed
         """
-        user_to_update = self.find_user_by(id=user_id)
-        user_keys = ['id', 'email', 'hashed_password', 'session_id',
-                     'reset_token']
-        for key, value in kwargs.items():
-            if key in user_keys:
-                setattr(user_to_update, key, value)
+        Update on the user's attributes
+        Args:
+            user_id (int): user's id
+            kwargs (dict): dict of key, value pairs representing the
+                           attributes to update and the values to update
+                           them with
+        Return:
+            No return value
+        """
+        try:
+            usr = self.find_user_by(id=user_id)
+        except NoResultFound:
+            raise ValueError()
+        for k, v in kwargs.items():
+            if hasattr(usr, k):
+                setattr(usr, k, v)
             else:
                 raise ValueError
         self._session.commit()
